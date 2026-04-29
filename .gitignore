@@ -1,0 +1,12 @@
+# Terraform local state
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Sensitive variables
+*.tfvars
+*.tfvars.json
+
+# OS files
+.DS_Store
