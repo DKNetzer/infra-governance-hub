@@ -57,10 +57,59 @@ resource "google_dataplex_asset" "tpc_h_prod_asset" {
   resource_spec {
     # This points across the project boundary to your physical data
     name = "projects/${var.spoke_project_id}/datasets/tpc_h_prod_iac"
-    type = "BIGQUERY_DATASET" # <--- This is the exact fix
+    type = "BIGQUERY_DATASET" 
   }
   
   discovery_spec {
     enabled = true
   }
+}
+# 7. Create the Aspect Type (Metadata Template) for Business Logic
+resource "google_dataplex_aspect_type" "business_rule_aspect" {
+  project        = var.hub_project_id
+  location       = var.region
+  aspect_type_id = "business-rule-aspect"
+  description    = "Stores deterministic SQL logic from the Git glossary."
+
+  metadata_template = jsonencode({
+    name = "business_rule" # <--- Added required root name
+    type = "record"
+    recordFields = [
+      {
+        name  = "sql_formula"
+        type  = "string"
+        index = 1
+      },
+      {
+        name  = "status"
+        type  = "string"
+        index = 2
+      }
+    ]
+  })
+}
+
+# 8. Create the Aspect Type for Security & PII Classification
+resource "google_dataplex_aspect_type" "security_classification_aspect" {
+  project        = var.hub_project_id
+  location       = var.region
+  aspect_type_id = "security-classification-aspect"
+  description    = "Data security and PII classification tags."
+
+  metadata_template = jsonencode({
+    name = "security_classification" # <--- Added required root name
+    type = "record"
+    recordFields = [
+      {
+        name  = "data_domain"
+        type  = "string"
+        index = 1
+      },
+      {
+        name  = "contains_pii"
+        type  = "bool" # <--- Changed from 'boolean' to 'bool'
+        index = 2
+      }
+    ]
+  })
 }
